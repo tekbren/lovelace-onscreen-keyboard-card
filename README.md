@@ -7,6 +7,8 @@
 A dependency-free on-screen keyboard for Home Assistant dashboards on
 touchscreen kiosks (wall tablets, fridge displays, etc.).
 
+![Keyboard open over a Home Assistant to-do list field](screenshot.png)
+
 ## Why not just use an OS-level virtual keyboard?
 
 Tools like `onboard` or `matchbox-keyboard` rely on the browser exposing a
