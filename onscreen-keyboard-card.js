@@ -40,6 +40,18 @@
     ["ABC", ",", "SPACE", ".", "⏎"]
   ];
 
+  // The real focused element, drilling through nested shadow roots -
+  // document.activeElement only ever reports the outermost shadow host, so
+  // for an <input> inside a custom card's shadow DOM we have to follow the
+  // activeElement chain down to the leaf.
+  function deepActiveElement() {
+    var el = document.activeElement;
+    while (el && el.shadowRoot && el.shadowRoot.activeElement) {
+      el = el.shadowRoot.activeElement;
+    }
+    return el;
+  }
+
   function isTextInput(el) {
     if (!el || !el.tagName) return false;
     var tag = el.tagName.toUpperCase();
@@ -178,12 +190,20 @@
   }
   render();
 
-  // Prevent the keyboard itself from ever stealing focus from the real
-  // input - without this, tapping a key would blur activeEl immediately.
-  kb.addEventListener("mousedown", function (e) { e.preventDefault(); });
-  kb.addEventListener("touchstart", function (e) { e.preventDefault(); }, { passive: false });
+  // Handle key presses on pointerdown, NOT click. Two reasons:
+  //  1. To stop the keyboard from stealing focus off the real input, the key
+  //     press has to preventDefault() the down-event. On a touchscreen, a
+  //     touchstart preventDefault also suppresses the synthetic click that
+  //     would otherwise follow - so a click-based handler simply never fires
+  //     on touch (and the field blurs, hiding the keyboard until the next
+  //     tap). Acting on pointerdown sidesteps that entirely.
+  //  2. pointerdown unifies mouse + touch + stylus in one path, so the same
+  //     code registers a physical finger tap and a mouse click identically.
+  kb.addEventListener("pointerdown", function (e) {
+    // Keep focus on the real input - this is what makes insertText target
+    // the right field instead of the button we just pressed.
+    e.preventDefault();
 
-  kb.addEventListener("click", function (e) {
     var btn = e.target.closest("button.kb-key");
     if (btn) {
       var idx = Array.prototype.indexOf.call(btn.parentNode.children, btn);
@@ -219,6 +239,20 @@
         hideKeyboard();
         activeEl = null;
       }, 150);
+    }
+  });
+
+  // Fallback for the "keyboard only appears on the second tap" case: some
+  // web-component text fields don't emit a focusin we catch on the very
+  // first tap (focus lands on a wrapper, or a card re-render swallows it).
+  // On any tap that finishes with a text input actually focused, make sure
+  // the keyboard is up. Runs after focusin, so it only ever corrects a miss.
+  document.addEventListener("pointerup", function () {
+    var el = deepActiveElement();
+    if (isTextInput(el)) {
+      cancelHide();
+      activeEl = el;
+      showKeyboard();
     }
   });
 })();
