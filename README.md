@@ -1,5 +1,9 @@
 # Lovelace On-Screen Keyboard
 
+> **Status: Beta, under active development.** Deployed and being tested on
+> one household kiosk so far — not yet broadly tested across devices/HA
+> versions. Interfaces and behavior may still change before a stable 1.0.
+
 A dependency-free on-screen keyboard for Home Assistant dashboards on
 touchscreen kiosks (wall tablets, fridge displays, etc.).
 
