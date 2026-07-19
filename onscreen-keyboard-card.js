@@ -1,5 +1,5 @@
 // Lovelace On-Screen Keyboard
-// https://github.com/REPLACE_ME/lovelace-onscreen-keyboard-card
+// https://github.com/tekbren/lovelace-onscreen-keyboard-card
 //
 // A pure page-level on-screen keyboard for Home Assistant dashboards on
 // touchscreen kiosks. No dependencies, no build step - a single JS file
