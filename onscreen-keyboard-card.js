@@ -137,6 +137,14 @@
     if (shift) { shift = false; render(); }
   }
 
+  // Auto-capitalise the first letter: turn shift on when the focused field is
+  // empty, so the first character comes out uppercase. handleKey() already
+  // clears shift after the next letter, so only that first char is affected.
+  function autoCapFirstLetter() {
+    shift = (((activeEl && activeEl.value) || "").length === 0);
+    render();
+  }
+
   var style = document.createElement("style");
   style.textContent = [
     "#" + KB_ID + "{position:fixed;left:0;right:0;bottom:0;",
@@ -237,6 +245,7 @@
     if (isTextInput(el)) {
       cancelHide();
       activeEl = el;
+      autoCapFirstLetter();
       showKeyboard();
     }
   });
@@ -260,7 +269,13 @@
     var el = deepActiveElement();
     if (isTextInput(el)) {
       cancelHide();
-      activeEl = el;
+      // Only re-evaluate auto-cap when focus actually moved to a new field -
+      // this handler also fires on every key tap, and resetting shift here
+      // would cancel the shift key mid-word.
+      if (el !== activeEl) {
+        activeEl = el;
+        autoCapFirstLetter();
+      }
       showKeyboard();
     }
   });
