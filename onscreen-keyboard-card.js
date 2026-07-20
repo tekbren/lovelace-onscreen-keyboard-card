@@ -143,7 +143,16 @@
     "transform:translateY(100%);transition:transform .18s ease-out;",
     "background:#1b1b1f;border-top:1px solid #3a3a3f;z-index:2147483647;",
     "padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));",
-    "box-shadow:0 -4px 16px rgba(0,0,0,.4);}",
+    "box-shadow:0 -4px 16px rgba(0,0,0,.4);",
+    // touch-action:none makes touch pointerdown events cancelable, so the
+    // preventDefault() below actually keeps focus on the real input. Without
+    // it, Chromium (kiosk) delivers a non-cancelable pointerdown, preventDefault
+    // is ignored, focus jumps to the tapped key, the field blurs, and the
+    // keyboard stops registering taps. -webkit-tap-highlight-color hides the
+    // grey flash on tap. Set on every keyboard element (touch-action isn't
+    // inherited, so the container alone isn't enough).
+    "-webkit-tap-highlight-color:transparent;}",
+    "#" + KB_ID + " *{touch-action:none;}",
     "#" + KB_ID + ".open{transform:translateY(0);}",
     "#" + KB_ID + " .kb-topbar{display:flex;justify-content:flex-end;padding:2px 4px 6px;}",
     "#" + KB_ID + " .kb-hide{color:#9aa0a6;font-size:22px;background:none;border:none;padding:4px 10px;}",
